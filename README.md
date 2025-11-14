@@ -295,18 +295,22 @@ All scenarios support CI/CD integration:
 
 ### Maintainer Tools
 
-For contributors and maintainers, this repository includes:
+For contributors and maintainers, this repository includes several utility scripts:
 
-**Terraform Formatting**
 ```powershell
-# Format all Terraform files across all scenarios
+# Format all Terraform files
 .\format-all.ps1
+
+# Validate repository health
+.\validate-repo.ps1
 ```
 
-**Code Consistency**
-- `.editorconfig` - Ensures consistent formatting across editors
-- `common-functions.ps1` - Shared PowerShell functions to reduce duplication
-- `terraform-modules/` - Reference implementations and best practices
+**Developer Resources**:
+- `common-functions.ps1` - Shared PowerShell functions
+- `.editorconfig` - Consistent formatting across editors
+- `terraform-modules/` - Reference implementations
+- [TOOLS.md](TOOLS.md) - Complete tool documentation
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 
 ## 📄 License
 

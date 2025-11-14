@@ -222,19 +222,7 @@ function Get-ScenarioSelection {
 }
 
 # ============================================================================
-# Export Functions
+# Functions are now available in the calling script's scope
 # ============================================================================
-
-Export-ModuleMember -Function @(
-    'Write-ColorOutput',
-    'Write-Header',
-    'Write-Success',
-    'Write-Info',
-    'Write-Warning2',
-    'Write-ErrorMsg',
-    'Get-ScenarioDefinitions',
-    'Test-Prerequisites',
-    'Get-AzureSubscriptionInfo',
-    'Show-ScenarioMenu',
-    'Get-ScenarioSelection'
-)
+# No Export-ModuleMember needed for .ps1 script files
+# All functions defined above are automatically available when dot-sourced
