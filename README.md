@@ -65,25 +65,9 @@ Complete Hybrid Worker environment with Windows VM, Hybrid Worker Extension, man
 
 ## 🚀 Quick Start
 
-### Interactive Deployment (Recommended)
+### Deploy from Azure Cloud Shell (Recommended)
 
-Use the interactive PowerShell script to deploy any scenario:
-
-```powershell
-.\deploy.ps1
-```
-
-The script provides:
-- ✅ Interactive menu with scenario selection
-- ✅ Prerequisite checking (Terraform, Azure CLI)
-- ✅ Scenario details
-- ✅ Automated Terraform init, plan, and apply
-- ✅ Post-deployment summary with cleanup reminders
-- ✅ Colorful, user-friendly interface
-
-### Deploy from Azure Cloud Shell
-
-Azure Cloud Shell has Terraform and Azure CLI pre-installed, making deployment even easier:
+Azure Cloud Shell has Terraform and Azure CLI pre-installed, making deployment easy:
 
 ```bash
 # 1. Open Azure Cloud Shell (PowerShell mode)
@@ -100,6 +84,14 @@ pwsh ./deploy.ps1
 ```
 
 **Note**: Cloud Shell automatically authenticates with your Azure subscription, so no `az login` is needed!
+
+The interactive script provides:
+- ✅ Interactive menu with scenario selection
+- ✅ Prerequisite checking (Terraform, Azure CLI)
+- ✅ Scenario details
+- ✅ Automated Terraform init, plan, and apply
+- ✅ Post-deployment summary with cleanup reminders
+- ✅ Colorful, user-friendly interface
 
 ### Manual Deployment
 
