@@ -5,174 +5,35 @@
     This script provides an interactive menu to deploy any of the 4 Azure Automation scenarios.
     Each scenario demonstrates different Azure Automation capabilities using Terraform.
 .NOTES
-    Version: 1.0
+    Version: 1.1
     Author: Azure Automation Demos
     Date: November 2025
 #>
 
-# ============================================================================
-# Color and UI Functions
-# ============================================================================
+# Import common functions
+. (Join-Path $PSScriptRoot "common-functions.ps1")
 
-function Write-ColorOutput {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$Message,
-        [Parameter(Mandatory=$false)]
-        [string]$ForegroundColor = "White"
-    )
-    Write-Host $Message -ForegroundColor $ForegroundColor
-}
-
-function Write-Header {
-    param([string]$Text)
-    Write-Host ""
-    Write-ColorOutput "╔══════════════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-ColorOutput "║  $($Text.PadRight(70))  ║" -ForegroundColor Cyan
-    Write-ColorOutput "╚══════════════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
-    Write-Host ""
-}
-
-function Write-Success {
-    param([string]$Message)
-    Write-ColorOutput "✅ $Message" -ForegroundColor Green
-}
-
-function Write-Info {
-    param([string]$Message)
-    Write-ColorOutput "ℹ️  $Message" -ForegroundColor Cyan
-}
-
-function Write-Warning2 {
-    param([string]$Message)
-    Write-ColorOutput "⚠️  $Message" -ForegroundColor Yellow
-}
-
-function Write-ErrorMsg {
-    param([string]$Message)
-    Write-ColorOutput "❌ $Message" -ForegroundColor Red
-}
+# Get scenario definitions with full details
+$scenarios = Get-ScenarioDefinitions -FullDetails
 
 # ============================================================================
-# Scenario Definitions
+# Deployment-Specific Helper Functions
 # ============================================================================
-
-$scenarios = @(
-    @{
-        Number = 1
-        Name = "Graph API Automation with Managed Identity"
-        Directory = "01-graph-api-automation"
-        Description = "Demonstrates Microsoft Graph API integration with Azure Automation using managed identities. Installs Graph SDK modules and grants permissions to read users, groups, and applications."
-        DeployTime = "~5-7 minutes"
-        Difficulty = "Intermediate"
-    },
-    @{
-        Number = 2
-        Name = "Start/Stop VMs with Tag-Based Scheduling"
-        Directory = "02-startstop-vms"
-        Description = "Automated VM power management based on PowerSchedule tags. Includes 3 VMs with different schedules (AlwaysOn, BusinessHours, NightShutdown) and automated start/stop runbooks."
-        DeployTime = "~8-10 minutes"
-        Difficulty = "Beginner"
-    },
-    @{
-        Number = 3
-        Name = "PowerShell 7.4 Runtime Environment"
-        Directory = "03-powershell74-runtime"
-        Description = "Showcases PowerShell 7.4 features in Azure Automation including runtime environments, modern syntax (ternary operators, null coalescing), parallel processing, and enhanced cmdlets."
-        DeployTime = "~6-8 minutes"
-        Difficulty = "Advanced"
-    },
-    @{
-        Number = 4
-        Name = "Hybrid Worker Lab Setup"
-        Directory = "04-hybrid-worker-setup"
-        Description = "Complete Hybrid Worker environment with Windows VM, Hybrid Worker Extension, managed identities, and test runbook. Demonstrates running automation outside Azure."
-        DeployTime = "~7-10 minutes"
-        Difficulty = "Intermediate"
-    }
-)
-
-# ============================================================================
-# Helper Functions
-# ============================================================================
-
-function Test-Prerequisites {
-    Write-Info "Checking prerequisites..."
-    
-    $missingTools = @()
-    
-    # Check Terraform
-    try {
-        $tfVersion = terraform version 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Success "Terraform is installed"
-        } else {
-            $missingTools += "Terraform"
-        }
-    } catch {
-        $missingTools += "Terraform"
-    }
-    
-    # Check Azure CLI
-    try {
-        $azVersion = az version 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Success "Azure CLI is installed"
-        } else {
-            $missingTools += "Azure CLI"
-        }
-    } catch {
-        $missingTools += "Azure CLI"
-    }
-    
-    if ($missingTools.Count -gt 0) {
-        Write-ErrorMsg "Missing required tools: $($missingTools -join ', ')"
-        Write-Info "Please install the missing tools and try again"
-        return $false
-    }
-    
-    Write-Success "All prerequisites are met"
-    return $true
-}
 
 function Show-MainMenu {
     Clear-Host
-    Write-Header "Azure Automation Demo Scenarios"
-    
-    Write-ColorOutput "Select a scenario to deploy:" -ForegroundColor White
-    Write-Host ""
-    
-    foreach ($scenario in $scenarios) {
-        Write-ColorOutput "  [$($scenario.Number)]" -ForegroundColor Yellow
-        Write-ColorOutput "    📌 $($scenario.Name)" -ForegroundColor Cyan
-        Write-ColorOutput "    📖 $($scenario.Description)" -ForegroundColor White
-        Write-ColorOutput "    ⏱️  Deploy Time: $($scenario.DeployTime)" -ForegroundColor Gray
-        Write-ColorOutput "    💰 Cost: $($scenario.Cost)" -ForegroundColor Gray
-        Write-ColorOutput "    📊 Difficulty: $($scenario.Difficulty)" -ForegroundColor Gray
-        Write-Host ""
-    }
-    
-    Write-ColorOutput "  [0] Exit" -ForegroundColor Red
-    Write-Host ""
+    Show-ScenarioMenu -Scenarios $scenarios -Title "Azure Automation Demo Scenarios - Deploy"
 }
 
 function Get-ScenarioChoice {
-    $choice = Read-Host "Enter your choice (0-4)"
+    $choice = Get-ScenarioSelection -Scenarios $scenarios
     
-    if ($choice -eq "0") {
+    if ($choice -eq 0) {
         Write-ColorOutput "`nGoodbye! 👋" -ForegroundColor Cyan
         exit 0
     }
     
-    $selectedScenario = $scenarios | Where-Object { $_.Number -eq [int]$choice }
-    
-    if ($null -eq $selectedScenario) {
-        Write-ErrorMsg "Invalid choice. Please select 0-4."
-        Start-Sleep -Seconds 2
-        return $null
-    }
-    
-    return $selectedScenario
+    return $scenarios | Where-Object { $_.Number -eq $choice }
 }
 
 function Show-ScenarioDetails {
@@ -182,7 +43,7 @@ function Show-ScenarioDetails {
     Write-Header "Scenario $($Scenario.Number): $($Scenario.Name)"
     
     Write-ColorOutput "📖 Description:" -ForegroundColor Cyan
-    Write-Host "   $($Scenario.Description)"
+    Write-Host "   $($Scenario.FullDescription)"
     Write-Host ""
     
     Write-ColorOutput "⏱️  Estimated Deploy Time: $($Scenario.DeployTime)" -ForegroundColor Yellow
@@ -197,18 +58,7 @@ function Confirm-Deployment {
     param($Scenario)
     
     # Get current subscription info
-    try {
-        $subInfo = az account show --query "{name:name, id:id}" -o json 2>$null | ConvertFrom-Json
-        if ($subInfo) {
-            Write-Host ""
-            Write-ColorOutput "Target Azure Subscription:" -ForegroundColor Cyan
-            Write-ColorOutput "  Name: $($subInfo.name)" -ForegroundColor White
-            Write-ColorOutput "  ID:   $($subInfo.id)" -ForegroundColor White
-            Write-Host ""
-        }
-    } catch {
-        # If we can't get subscription info, continue anyway
-    }
+    $subInfo = Get-AzureSubscriptionInfo
     
     Write-Warning2 "This will deploy resources to your Azure subscription."
     Write-Host ""

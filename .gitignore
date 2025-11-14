@@ -5,12 +5,16 @@
 *.tfstate.*
 *.tfvars
 *.tfplan
+tfplan
+*tfplan*
 crash.log
 crash.*.log
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+.terraformrc
+terraform.rc
 
 # Azure
 .azure/
@@ -28,6 +32,10 @@ override.tf.json
 *.swo
 *~
 .DS_Store
+
+# Temporary test directories
+/test/
+/temp/
 
 # Logs
 *.log
