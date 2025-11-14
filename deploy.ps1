@@ -350,7 +350,15 @@ function Main {
         if ($deploymentSuccess) {
             Show-PostDeployment -Scenario $selectedScenario
         } else {
-            Write-ErrorMsg "Deployment failed. Please check the errors above."
+            Write-Host ""
+            Write-ErrorMsg "═══════════════════════════════════════════════════════════════════════"
+            Write-ErrorMsg "Deployment failed. Please review the errors above."
+            Write-ErrorMsg "═══════════════════════════════════════════════════════════════════════"
+            Write-Host ""
+            Write-Info "Common issues:"
+            Write-Host "  • Scenario 1: Requires Privileged Administrator role in Entra ID"
+            Write-Host "  • Check subscription permissions (Contributor role needed)"
+            Write-Host "  • Verify Terraform and Azure CLI are working correctly"
             Write-Host ""
         }
         
