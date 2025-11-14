@@ -80,9 +80,11 @@ resource "null_resource" "ps74_runtime" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      az account get-access-token --output none
       az rest --method put \
         --url "https://management.azure.com${azurerm_automation_account.main.id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" \
-        --body '{"location": "${azurerm_resource_group.main.location}", "properties": {"runtime": {"language": "PowerShell", "version": "7.4"}, "description": "PowerShell 7.4 runtime environment with modern Az modules", "defaultPackages": {}}}'
+        --body '{"location": "${azurerm_resource_group.main.location}", "properties": {"runtime": {"language": "PowerShell", "version": "7.4"}, "description": "PowerShell 7.4 runtime environment with modern Az modules", "defaultPackages": {}}}' \
+        --only-show-errors
     EOT
   }
 
@@ -125,7 +127,8 @@ resource "null_resource" "runtime_packages" {
     command = <<-EOT
       az rest --method put \
         --url "https://management.azure.com${local.runtime_id}/packages/${each.key}?api-version=2023-05-15-preview" \
-        --body '{"properties": {"contentLink": {"uri": "https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}"}}}'
+        --body '{"properties": {"contentLink": {"uri": "https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}"}}}' \
+        --only-show-errors
     EOT
   }
 
@@ -266,7 +269,8 @@ resource "null_resource" "link_ps74_features_runtime" {
     command = <<-EOT
       az rest --method patch \
         --url "https://management.azure.com${azurerm_automation_runbook.ps74_features.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
+        --only-show-errors
     EOT
   }
 
@@ -374,7 +378,8 @@ resource "null_resource" "link_parallel_processing_runtime" {
     command = <<-EOT
       az rest --method patch \
         --url "https://management.azure.com${azurerm_automation_runbook.parallel_processing.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
+        --only-show-errors
     EOT
   }
 
@@ -498,7 +503,8 @@ resource "null_resource" "link_modern_query_runtime" {
     command = <<-EOT
       az rest --method patch \
         --url "https://management.azure.com${azurerm_automation_runbook.modern_query.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
+        --only-show-errors
     EOT
   }
 

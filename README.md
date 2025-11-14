@@ -152,8 +152,6 @@ Each scenario requires different permissions:
 | 3 - PowerShell 7.4 | Contributor on resource group | ✅ Works with standard permissions |
 | 4 - Hybrid Worker | Contributor on subscription (for role assignments) | ✅ Works with standard permissions |
 
-**Recommendation**: Start with **Scenario 2** (Start/Stop VMs) if you don't have elevated Entra ID permissions.
-
 ### Installation Verification
 
 ```powershell
