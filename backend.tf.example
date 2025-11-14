@@ -1,100 +1,29 @@
 # ============================================================================
-# Backend Configuration Example for Remote State
+# Backend Configuration Example for Remote State (Optional)
 # ============================================================================
-# This is an EXAMPLE backend configuration for storing Terraform state remotely.
 # Copy this file to your scenario directory as 'backend.tf' and customize it.
-#
-# Benefits of Remote State:
-# - Team collaboration (shared state)
-# - State locking (prevents concurrent modifications)
-# - Enhanced security (state stored in Azure)
-# - Audit trail and versioning
-#
-# Setup Instructions:
-# 1. Create an Azure Storage Account for Terraform state
-# 2. Create a container in the storage account (e.g., "tfstate")
-# 3. Copy this file to your scenario directory as 'backend.tf'
-# 4. Update the values below with your storage account details
-# 5. Run 'terraform init' to migrate state to remote backend
-#
+# This enables remote state storage in Azure for team collaboration.
 # ============================================================================
 
 terraform {
   backend "azurerm" {
-    # REQUIRED: Update these values with your storage account details
     resource_group_name  = "rg-terraform-state"
-    storage_account_name = "tfstate<your-unique-id>"
+    storage_account_name = "tfstate<unique-id>"
     container_name       = "tfstate"
-    key                  = "scenario-name.terraform.tfstate" # Change per scenario
-
-    # OPTIONAL: Use a specific subscription for state storage
-    # subscription_id = "00000000-0000-0000-0000-000000000000"
-
-    # OPTIONAL: Enable versioning for state file history
-    # use_azuread_auth = true
+    key                  = "scenario-name.terraform.tfstate"
   }
 }
 
 # ============================================================================
-# Quick Setup Commands (run in Azure Cloud Shell PowerShell or Bash)
+# Quick Setup (Azure Cloud Shell)
 # ============================================================================
-#
-# PowerShell:
-# -----------
-# $RG_NAME = "rg-terraform-state"
-# $LOCATION = "eastus"
-# $SA_NAME = "tfstate$(Get-Random -Minimum 1000 -Maximum 9999)"
 # 
-# # Create resource group
-# az group create --name $RG_NAME --location $LOCATION
+# # Create storage account (one-time setup)
+# STORAGE_ACCOUNT="tfstate$RANDOM"
+# az group create --name rg-terraform-state --location eastus
+# az storage account create --name $STORAGE_ACCOUNT --resource-group rg-terraform-state --location eastus --sku Standard_LRS
+# az storage container create --name tfstate --account-name $STORAGE_ACCOUNT --auth-mode login
 # 
-# # Create storage account
-# az storage account create `
-#   --name $SA_NAME `
-#   --resource-group $RG_NAME `
-#   --location $LOCATION `
-#   --sku Standard_LRS `
-#   --encryption-services blob `
-#   --https-only true `
-#   --min-tls-version TLS1_2
-# 
-# # Create container
-# az storage container create `
-#   --name tfstate `
-#   --account-name $SA_NAME `
-#   --auth-mode login
-# 
-# Write-Output "Backend configuration values:"
-# Write-Output "storage_account_name = `"$SA_NAME`""
-# Write-Output "container_name = `"tfstate`""
-#
-# Bash:
-# -----
-# RG_NAME="rg-terraform-state"
-# LOCATION="eastus"
-# SA_NAME="tfstate$RANDOM"
-# 
-# # Create resource group
-# az group create --name $RG_NAME --location $LOCATION
-# 
-# # Create storage account
-# az storage account create \
-#   --name $SA_NAME \
-#   --resource-group $RG_NAME \
-#   --location $LOCATION \
-#   --sku Standard_LRS \
-#   --encryption-services blob \
-#   --https-only true \
-#   --min-tls-version TLS1_2
-# 
-# # Create container
-# az storage container create \
-#   --name tfstate \
-#   --account-name $SA_NAME \
-#   --auth-mode login
-# 
-# echo "Backend configuration values:"
-# echo "storage_account_name = \"$SA_NAME\""
-# echo "container_name = \"tfstate\""
-#
+# # Update storage_account_name above with $STORAGE_ACCOUNT value
+# # Then run: terraform init
 # ============================================================================

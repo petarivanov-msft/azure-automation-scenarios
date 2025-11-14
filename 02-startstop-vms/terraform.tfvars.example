@@ -1,0 +1,17 @@
+# ============================================================================
+# Example Variables - Copy to terraform.tfvars and customize
+# ============================================================================
+
+location            = "eastus"
+resource_prefix     = "startstop"  # 3-10 lowercase alphanumeric characters
+admin_username      = "azureadmin"
+vm_size             = "Standard_B2s"
+timezone            = "Eastern Standard Time"
+schedule_start_time = ""  # Optional: ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)
+auto_test_runbook   = true
+
+tags = {
+  Environment = "Demo"
+  Project     = "StartStopVMs"
+  ManagedBy   = "Terraform"
+}

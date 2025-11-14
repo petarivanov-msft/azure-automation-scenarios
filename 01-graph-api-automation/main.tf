@@ -110,6 +110,12 @@ resource "azurerm_automation_module" "graph_users" {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Users/2.11.1"
   }
 
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
+
   depends_on = [azurerm_automation_module.graph_authentication]
 }
 
@@ -123,6 +129,12 @@ resource "azurerm_automation_module" "graph_groups" {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Groups/2.11.1"
   }
 
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
+
   depends_on = [azurerm_automation_module.graph_authentication]
 }
 
@@ -134,6 +146,12 @@ resource "azurerm_automation_module" "graph_applications" {
 
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Applications/2.11.1"
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
   }
 
   depends_on = [azurerm_automation_module.graph_authentication]
