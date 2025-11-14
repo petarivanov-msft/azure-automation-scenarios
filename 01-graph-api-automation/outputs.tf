@@ -97,7 +97,7 @@ output "portal_runbook_get_applications_link" {
 
 output "deployment_summary" {
   description = "Summary of deployed resources"
-  value = <<-EOT
+  value       = <<-EOT
     
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║       Azure Automation - Microsoft Graph API Automation                  ║

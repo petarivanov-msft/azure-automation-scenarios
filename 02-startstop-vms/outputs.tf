@@ -105,7 +105,7 @@ output "portal_vm3_link" {
 # Summary Output
 output "deployment_summary" {
   description = "Summary of deployed resources"
-  value = <<-EOT
+  value       = <<-EOT
     
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║           Azure Automation - Start/Stop VMs with Tags                    ║

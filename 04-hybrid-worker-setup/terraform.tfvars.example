@@ -1,0 +1,16 @@
+# ============================================================================
+# Example Variables - Copy to terraform.tfvars and customize
+# ============================================================================
+
+resource_group_name = "rg-hybrid-worker-lab"
+location            = "eastus"
+prefix              = "hwlab"
+vm_size             = "Standard_B2s"
+admin_username      = "azureadmin"
+run_test_runbook    = true
+
+tags = {
+  Environment = "Lab"
+  Purpose     = "HybridWorker"
+  ManagedBy   = "Terraform"
+}

@@ -412,7 +412,7 @@ resource "azurerm_automation_runbook" "test_hybrid_worker" {
 
 resource "null_resource" "publish_runbook" {
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
       $runbook = az automation runbook show `
         --automation-account-name ${azurerm_automation_account.automation.name} `
         --resource-group ${azurerm_resource_group.rg.name} `
@@ -444,7 +444,7 @@ resource "null_resource" "run_test_runbook" {
   count = var.run_test_runbook ? 1 : 0
 
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
       Write-Host "Starting test runbook on hybrid worker..."
       
       $job = az automation runbook start `

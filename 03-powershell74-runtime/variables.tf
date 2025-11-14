@@ -6,6 +6,11 @@ variable "location" {
   description = "Azure region for resources"
   type        = string
   default     = "eastus"
+
+  validation {
+    condition     = can(regex("^[a-z0-9]+$", var.location))
+    error_message = "Location must be a valid Azure region name (lowercase, no spaces). Example: 'eastus', 'westeurope', 'southeastasia'."
+  }
 }
 
 variable "resource_prefix" {

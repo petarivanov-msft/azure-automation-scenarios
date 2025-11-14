@@ -1,0 +1,13 @@
+# ============================================================================
+# Example Variables - Copy to terraform.tfvars and customize
+# ============================================================================
+
+location          = "eastus"
+resource_prefix   = "ps74demo"  # 3-10 lowercase alphanumeric characters
+auto_test_runbook = false
+
+tags = {
+  Environment = "Demo"
+  Project     = "PowerShell74Runtime"
+  ManagedBy   = "Terraform"
+}

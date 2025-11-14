@@ -7,7 +7,8 @@
 # - Sample runbooks using Graph API to query users, groups, and applications
 # - Automated runbook execution for testing
 #
-# Cloud Shell Compatible: Uses Bash and jq (no PowerShell dependencies)
+# Azure Cloud Shell Compatible: Works in both PowerShell and Bash modes
+# Requires: Terraform 1.5+, Azure CLI authentication
 # ============================================================================
 
 terraform {
@@ -60,12 +61,22 @@ resource "azurerm_automation_account" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = "Basic"
-  
+
   identity {
     type = "SystemAssigned"
   }
-  
+
   tags = var.tags
+
+  lifecycle {
+    prevent_destroy = false
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
+  }
 }
 
 # ============================================================================
@@ -81,6 +92,12 @@ resource "azurerm_automation_module" "graph_authentication" {
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Authentication/2.11.1"
   }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
 }
 
 # Microsoft.Graph.Users module
@@ -91,6 +108,12 @@ resource "azurerm_automation_module" "graph_users" {
 
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Users/2.11.1"
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
   }
 
   depends_on = [azurerm_automation_module.graph_authentication]
@@ -106,6 +129,12 @@ resource "azurerm_automation_module" "graph_groups" {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Groups/2.11.1"
   }
 
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
+
   depends_on = [azurerm_automation_module.graph_authentication]
 }
 
@@ -117,6 +146,12 @@ resource "azurerm_automation_module" "graph_applications" {
 
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Microsoft.Graph.Applications/2.11.1"
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
   }
 
   depends_on = [azurerm_automation_module.graph_authentication]

@@ -1,0 +1,13 @@
+# ============================================================================
+# Example Variables - Copy to terraform.tfvars and customize
+# ============================================================================
+
+location          = "eastus"
+resource_prefix   = "graphauto"  # 3-10 lowercase alphanumeric characters
+auto_test_runbook = true
+
+tags = {
+  Environment = "Demo"
+  Project     = "GraphAPIAutomation"
+  ManagedBy   = "Terraform"
+}

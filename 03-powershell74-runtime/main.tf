@@ -8,7 +8,8 @@
 # - Parallel processing capabilities
 # - Modern PowerShell syntax and features
 #
-# Cloud Shell Compatible: Uses Bash and jq (no PowerShell dependencies)
+# Azure Cloud Shell Compatible: Works in both PowerShell and Bash modes
+# Requires: Terraform 1.5+, Azure CLI authentication
 # ============================================================================
 
 terraform {
@@ -64,6 +65,16 @@ resource "azurerm_automation_account" "main" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    prevent_destroy = false
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
+  }
 }
 
 # ============================================================================
