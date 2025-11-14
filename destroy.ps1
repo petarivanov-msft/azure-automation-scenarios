@@ -5,112 +5,20 @@
     This script scans for deployed scenarios and provides an interactive menu to destroy them.
     It identifies deployed scenarios by checking for .terraform directories.
 .NOTES
-    Version: 1.0
+    Version: 1.1
     Author: Azure Automation Demos
     Date: November 2025
 #>
 
-# ============================================================================
-# Color and UI Functions
-# ============================================================================
+# Import common functions
+. (Join-Path $PSScriptRoot "common-functions.ps1")
 
-function Write-ColorOutput {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$Message,
-        [Parameter(Mandatory=$false)]
-        [string]$ForegroundColor = "White"
-    )
-    Write-Host $Message -ForegroundColor $ForegroundColor
-}
-
-function Write-Header {
-    param([string]$Text)
-    Write-Host ""
-    Write-ColorOutput "╔══════════════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-ColorOutput "║  $($Text.PadRight(70))  ║" -ForegroundColor Cyan
-    Write-ColorOutput "╚══════════════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
-    Write-Host ""
-}
-
-function Write-Success {
-    param([string]$Message)
-    Write-ColorOutput "✅ $Message" -ForegroundColor Green
-}
-
-function Write-Info {
-    param([string]$Message)
-    Write-ColorOutput "ℹ️  $Message" -ForegroundColor Cyan
-}
-
-function Write-Warning2 {
-    param([string]$Message)
-    Write-ColorOutput "⚠️  $Message" -ForegroundColor Yellow
-}
-
-function Write-ErrorMsg {
-    param([string]$Message)
-    Write-ColorOutput "❌ $Message" -ForegroundColor Red
-}
+# Get scenario definitions
+$scenarios = Get-ScenarioDefinitions
 
 # ============================================================================
-# Scenario Definitions
+# Cleanup-Specific Helper Functions
 # ============================================================================
-
-$scenarios = @(
-    @{
-        Number = 1
-        Name = "Graph API Automation with Managed Identity"
-        Directory = "01-graph-api-automation"
-        Description = "Microsoft Graph API integration with Azure Automation"
-    },
-    @{
-        Number = 2
-        Name = "Start/Stop VMs with Tag-Based Scheduling"
-        Directory = "02-startstop-vms"
-        Description = "Automated VM power management with 3 test VMs"
-    },
-    @{
-        Number = 3
-        Name = "PowerShell 7.4 Runtime Environment"
-        Directory = "03-powershell74-runtime"
-        Description = "PowerShell 7.4 features and runtime environment"
-    },
-    @{
-        Number = 4
-        Name = "Hybrid Worker Lab Setup"
-        Directory = "04-hybrid-worker-setup"
-        Description = "Hybrid Worker with Windows VM and test runbook"
-    }
-)
-
-# ============================================================================
-# Helper Functions
-# ============================================================================
-
-function Test-Prerequisites {
-    Write-Info "Checking prerequisites..."
-    
-    $terraformInstalled = Get-Command terraform -ErrorAction SilentlyContinue
-    $azInstalled = Get-Command az -ErrorAction SilentlyContinue
-    
-    if (-not $terraformInstalled) {
-        Write-ErrorMsg "Terraform is not installed or not in PATH"
-        Write-Info "Download from: https://www.terraform.io/downloads"
-        return $false
-    }
-    
-    if (-not $azInstalled) {
-        Write-ErrorMsg "Azure CLI is not installed or not in PATH"
-        Write-Info "Download from: https://docs.microsoft.com/cli/azure/install-azure-cli"
-        return $false
-    }
-    
-    Write-Success "Terraform: $(terraform version -json | ConvertFrom-Json | Select-Object -ExpandProperty terraform_version)"
-    Write-Success "Azure CLI: $(az version --query '\"azure-cli\"' -o tsv)"
-    
-    return $true
-}
 
 function Get-DeployedScenarios {
     Write-Info "Scanning for deployed scenarios..."
