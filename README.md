@@ -145,12 +145,14 @@ The cleanup script provides:
 
 Each scenario requires different permissions:
 
-| Scenario | Required Permissions |
-|----------|---------------------|
-| 1 - Graph API | Microsoft Graph Application.ReadWrite.All (to grant API permissions) |
-| 2 - Start/Stop VMs | Contributor on resource group |
-| 3 - PowerShell 7.4 | Contributor on resource group |
-| 4 - Hybrid Worker | Contributor on subscription (for role assignments) |
+| Scenario | Required Permissions | Notes |
+|----------|---------------------|-------|
+| 1 - Graph API | **Privileged Administrator** or **Application Administrator** role in Entra ID | ⚠️ Requires elevated permissions to grant Graph API permissions |
+| 2 - Start/Stop VMs | Contributor on resource group | ✅ Works with standard permissions |
+| 3 - PowerShell 7.4 | Contributor on resource group | ✅ Works with standard permissions |
+| 4 - Hybrid Worker | Contributor on subscription (for role assignments) | ✅ Works with standard permissions |
+
+**Recommendation**: Start with **Scenario 2** (Start/Stop VMs) if you don't have elevated Entra ID permissions.
 
 ### Installation Verification
 

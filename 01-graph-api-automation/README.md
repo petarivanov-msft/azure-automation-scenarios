@@ -2,6 +2,14 @@
 
 Real-world Azure Automation scenario using Microsoft Graph PowerShell SDK with managed identity to query users, groups, and applications from Azure AD/Entra ID.
 
+## ⚠️ Prerequisites
+
+**Important**: This scenario requires **elevated Azure AD/Entra ID permissions**:
+- **Privileged Administrator** or **Application Administrator** role in Entra ID
+- Required to grant Graph API permissions to the managed identity
+
+**Don't have these permissions?** Try **Scenario 2** (Start/Stop VMs) or **Scenario 3** (PowerShell 7.4) instead.
+
 ## 🎯 What This Does
 
 Creates a production-ready Graph API automation environment with:
