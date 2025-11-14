@@ -90,10 +90,10 @@ Azure Cloud Shell has Terraform and Azure CLI pre-installed, making deployment e
 #    https://shell.azure.com
 
 # 2. Clone the repository
-git clone https://github.com/petarivanov-msft/azure-automation-demos.git
+git clone https://github.com/petarivanov-msft/azure-automation-scenarios.git
 
 # 3. Navigate to the repository
-cd azure-automation-demos
+cd azure-automation-scenarios
 
 # 4. Run the interactive deployment script
 pwsh ./deploy.ps1
