@@ -83,7 +83,7 @@ git clone https://github.com/petarivanov-msft/azure-automation-scenarios.git
 cd azure-automation-scenarios
 
 # 5. Run the interactive deployment script
-pwsh ./deploy.ps1
+./deploy.ps1
 ```
 
 **Note**: Cloud Shell automatically authenticates with your Azure subscription, so no `az login` is needed!
