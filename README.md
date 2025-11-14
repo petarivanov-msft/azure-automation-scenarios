@@ -185,9 +185,17 @@ Across all scenarios, you'll gain hands-on experience with:
 ```
 azure-automation-demos/
 ├── deploy.ps1                      # Interactive deployment script
+├── destroy.ps1                     # Interactive cleanup script
+├── common-functions.ps1            # Shared PowerShell functions
+├── format-all.ps1                  # Terraform formatting utility
 ├── README.md                       # This file
 ├── LICENSE                         # MIT License
 ├── .gitignore                      # Git ignore patterns
+├── .editorconfig                   # Editor configuration for consistent formatting
+│
+├── terraform-modules/              # Shared Terraform resources & docs
+│   ├── README.md                   # Module documentation
+│   └── common-variables/           # Reference implementations
 │
 ├── 01-graph-api-automation/        # Scenario 1
 │   ├── main.tf                     # Terraform configuration
@@ -284,6 +292,21 @@ All scenarios support CI/CD integration:
 - Use service principal authentication
 - Store state in Azure Storage backend
 - Implement approval gates for production
+
+### Maintainer Tools
+
+For contributors and maintainers, this repository includes:
+
+**Terraform Formatting**
+```powershell
+# Format all Terraform files across all scenarios
+.\format-all.ps1
+```
+
+**Code Consistency**
+- `.editorconfig` - Ensures consistent formatting across editors
+- `common-functions.ps1` - Shared PowerShell functions to reduce duplication
+- `terraform-modules/` - Reference implementations and best practices
 
 ## 📄 License
 

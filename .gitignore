@@ -33,6 +33,10 @@ terraform.rc
 *~
 .DS_Store
 
+# Temporary test directories
+/test/
+/temp/
+
 # Logs
 *.log
 logs/
