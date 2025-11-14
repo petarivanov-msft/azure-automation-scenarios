@@ -18,9 +18,9 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 1.0"
     }
   }
 }
@@ -58,11 +58,11 @@ resource "azurerm_automation_account" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = "Basic"
-  
+
   identity {
     type = "SystemAssigned"
   }
-  
+
   tags = var.tags
 }
 
@@ -72,67 +72,60 @@ resource "azurerm_automation_account" "main" {
 # NOTE: The azapi provider has authentication issues with runtime environments.
 # We use Azure CLI via local-exec as a workaround since it has proper permissions.
 
-resource "null_resource" "ps74_runtime" {
-  triggers = {
-    automation_account_id = azurerm_automation_account.main.id
-    runtime_version       = "7.4"
-  }
+# ============================================================================
+# PowerShell 7.4 Runtime Environment
+# ============================================================================
+# Create runtime environment using azapi provider (Cloud Shell compatible)
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      az account get-access-token --output none
-      az rest --method put \
-        --url "https://management.azure.com${azurerm_automation_account.main.id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" \
-        --body '{"location": "${azurerm_resource_group.main.location}", "properties": {"runtime": {"language": "PowerShell", "version": "7.4"}, "description": "PowerShell 7.4 runtime environment with modern Az modules", "defaultPackages": {}}}' \
-        --only-show-errors
-    EOT
-  }
+resource "azapi_resource" "ps74_runtime" {
+  type      = "Microsoft.Automation/automationAccounts/runtimeEnvironments@2023-05-15-preview"
+  name      = "ps74-runtime"
+  parent_id = azurerm_automation_account.main.id
+  location  = azurerm_resource_group.main.location
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      az rest --method delete \
-        --url "https://management.azure.com${self.triggers.automation_account_id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" || true
-    EOT
-    on_failure  = continue
-  }
+  body = jsonencode({
+    properties = {
+      runtime = {
+        language = "PowerShell"
+        version  = "7.4"
+      }
+      description     = "PowerShell 7.4 runtime environment with modern Az modules"
+      defaultPackages = {}
+    }
+  })
 }
 
 # ============================================================================
 # Add Packages to PowerShell 7.4 Runtime
 # ============================================================================
-# NOTE: Using Azure CLI via local-exec due to azapi auth issues
+# Using azapi provider for Cloud Shell compatibility
 
 locals {
-  runtime_id = "${azurerm_automation_account.main.id}/runtimeEnvironments/ps74-runtime"
   packages = {
-    "Az.Accounts" = "3.0.4"
-    "Az.Compute"  = "8.3.0"
-    "Az.Storage"  = "7.3.0"
+    "Az.Accounts"  = "3.0.4"
+    "Az.Compute"   = "8.3.0"
+    "Az.Storage"   = "7.3.0"
     "Az.Resources" = "7.4.0"
-    "Az.Monitor"  = "5.2.1"
+    "Az.Monitor"   = "5.2.1"
   }
 }
 
-resource "null_resource" "runtime_packages" {
+resource "azapi_resource" "runtime_packages" {
   for_each = local.packages
 
-  triggers = {
-    runtime_id = null_resource.ps74_runtime.id
-    package    = each.key
-    version    = each.value
-  }
+  type      = "Microsoft.Automation/automationAccounts/runtimeEnvironments/packages@2023-05-15-preview"
+  name      = each.key
+  parent_id = azapi_resource.ps74_runtime.id
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      az rest --method put \
-        --url "https://management.azure.com${local.runtime_id}/packages/${each.key}?api-version=2023-05-15-preview" \
-        --body '{"properties": {"contentLink": {"uri": "https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}"}}}' \
-        --only-show-errors
-    EOT
-  }
+  body = jsonencode({
+    properties = {
+      contentLink = {
+        uri = "https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}"
+      }
+    }
+  })
 
-  depends_on = [null_resource.ps74_runtime]
+  depends_on = [azapi_resource.ps74_runtime]
 }
 
 # ============================================================================
@@ -165,7 +158,7 @@ resource "azurerm_automation_runbook" "ps74_features" {
   automation_account_name = azurerm_automation_account.main.name
   log_verbose             = "true"
   log_progress            = "true"
-  runbook_type            = "PowerShell"  # PowerShell type supports runtime environments
+  runbook_type            = "PowerShell" # PowerShell type supports runtime environments
 
   content = <<-EOT
     #Requires -Version 7.4
@@ -257,26 +250,20 @@ resource "azurerm_automation_runbook" "ps74_features" {
   tags = var.tags
 }
 
-# Link runbook to PowerShell 7.4 runtime environment
-resource "null_resource" "link_ps74_features_runtime" {
-  triggers = {
-    runbook_id     = azurerm_automation_runbook.ps74_features.id
-    runtime_id     = null_resource.ps74_runtime.id
-    packages       = join(",", keys(local.packages))
-  }
+# Link runbook to PowerShell 7.4 runtime environment using azapi_update_resource
+resource "azapi_update_resource" "link_ps74_features_runtime" {
+  type        = "Microsoft.Automation/automationAccounts/runbooks@2024-10-23"
+  resource_id = azurerm_automation_runbook.ps74_features.id
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      az rest --method patch \
-        --url "https://management.azure.com${azurerm_automation_runbook.ps74_features.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
-        --only-show-errors
-    EOT
-  }
+  body = jsonencode({
+    properties = {
+      runtimeEnvironment = "ps74-runtime"
+    }
+  })
 
   depends_on = [
     azurerm_automation_runbook.ps74_features,
-    null_resource.runtime_packages
+    azapi_resource.runtime_packages
   ]
 }
 
@@ -366,26 +353,20 @@ resource "azurerm_automation_runbook" "parallel_processing" {
   tags = var.tags
 }
 
-# Link runbook to PowerShell 7.4 runtime environment
-resource "null_resource" "link_parallel_processing_runtime" {
-  triggers = {
-    runbook_id     = azurerm_automation_runbook.parallel_processing.id
-    runtime_id     = null_resource.ps74_runtime.id
-    packages       = join(",", keys(local.packages))
-  }
+# Link runbook to PowerShell 7.4 runtime environment using azapi_update_resource
+resource "azapi_update_resource" "link_parallel_processing_runtime" {
+  type        = "Microsoft.Automation/automationAccounts/runbooks@2024-10-23"
+  resource_id = azurerm_automation_runbook.parallel_processing.id
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      az rest --method patch \
-        --url "https://management.azure.com${azurerm_automation_runbook.parallel_processing.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
-        --only-show-errors
-    EOT
-  }
+  body = jsonencode({
+    properties = {
+      runtimeEnvironment = "ps74-runtime"
+    }
+  })
 
   depends_on = [
     azurerm_automation_runbook.parallel_processing,
-    null_resource.runtime_packages
+    azapi_resource.runtime_packages
   ]
 }
 
@@ -491,26 +472,20 @@ resource "azurerm_automation_runbook" "modern_query" {
   tags = var.tags
 }
 
-# Link runbook to PowerShell 7.4 runtime environment
-resource "null_resource" "link_modern_query_runtime" {
-  triggers = {
-    runbook_id     = azurerm_automation_runbook.modern_query.id
-    runtime_id     = null_resource.ps74_runtime.id
-    packages       = join(",", keys(local.packages))
-  }
+# Link runbook to PowerShell 7.4 runtime environment using azapi_update_resource
+resource "azapi_update_resource" "link_modern_query_runtime" {
+  type        = "Microsoft.Automation/automationAccounts/runbooks@2024-10-23"
+  resource_id = azurerm_automation_runbook.modern_query.id
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      az rest --method patch \
-        --url "https://management.azure.com${azurerm_automation_runbook.modern_query.id}?api-version=2024-10-23" \
-        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}' \
-        --only-show-errors
-    EOT
-  }
+  body = jsonencode({
+    properties = {
+      runtimeEnvironment = "ps74-runtime"
+    }
+  })
 
   depends_on = [
     azurerm_automation_runbook.modern_query,
-    null_resource.runtime_packages
+    azapi_resource.runtime_packages
   ]
 }
 
@@ -536,7 +511,7 @@ resource "null_resource" "run_ps74_features" {
   }
 
   depends_on = [
-    null_resource.link_ps74_features_runtime
+    azapi_update_resource.link_ps74_features_runtime
   ]
 }
 
@@ -557,7 +532,7 @@ resource "null_resource" "run_parallel_processing" {
   }
 
   depends_on = [
-    null_resource.link_parallel_processing_runtime,
+    azapi_update_resource.link_parallel_processing_runtime,
     null_resource.run_ps74_features
   ]
 }
@@ -584,7 +559,7 @@ resource "null_resource" "run_modern_query" {
   }
 
   depends_on = [
-    null_resource.link_modern_query_runtime,
+    azapi_update_resource.link_modern_query_runtime,
     null_resource.run_parallel_processing
   ]
 }

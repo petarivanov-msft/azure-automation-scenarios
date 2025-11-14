@@ -62,7 +62,7 @@ output "portal_resource_group_link" {
 # Summary
 output "deployment_summary" {
   description = "Summary of deployed resources"
-  value = <<-EOT
+  value       = <<-EOT
     
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║         Azure Automation - PowerShell 7.4 Runtime Environment            ║
