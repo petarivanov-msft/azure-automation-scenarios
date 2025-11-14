@@ -196,6 +196,20 @@ function Show-ScenarioDetails {
 function Confirm-Deployment {
     param($Scenario)
     
+    # Get current subscription info
+    try {
+        $subInfo = az account show --query "{name:name, id:id}" -o json 2>$null | ConvertFrom-Json
+        if ($subInfo) {
+            Write-Host ""
+            Write-ColorOutput "Target Azure Subscription:" -ForegroundColor Cyan
+            Write-ColorOutput "  Name: $($subInfo.name)" -ForegroundColor White
+            Write-ColorOutput "  ID:   $($subInfo.id)" -ForegroundColor White
+            Write-Host ""
+        }
+    } catch {
+        # If we can't get subscription info, continue anyway
+    }
+    
     Write-Warning2 "This will deploy resources to your Azure subscription."
     Write-Host ""
     
