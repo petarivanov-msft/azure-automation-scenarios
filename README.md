@@ -73,13 +73,16 @@ Azure Cloud Shell has Terraform and Azure CLI pre-installed, making deployment e
 # 1. Open Azure Cloud Shell (PowerShell mode)
 #    https://shell.azure.com
 
-# 2. Clone the repository
+# 2. (Optional) Change subscription if needed
+az account set --subscription "YOUR_SUBSCRIPTION_ID_OR_NAME"
+
+# 3. Clone the repository
 git clone https://github.com/petarivanov-msft/azure-automation-scenarios.git
 
-# 3. Navigate to the repository
+# 4. Navigate to the repository
 cd azure-automation-scenarios
 
-# 4. Run the interactive deployment script
+# 5. Run the interactive deployment script
 pwsh ./deploy.ps1
 ```
 
@@ -161,18 +164,6 @@ az version
 # Check PowerShell
 $PSVersionTable.PSVersion
 ```
-
-## 🎓 Learning Path
-
-### Beginner Track
-1. Start with **Scenario 2** (Start/Stop VMs) - easiest to understand
-2. Move to **Scenario 1** (Graph API) - introduces managed identities
-3. Try **Scenario 4** (Hybrid Worker) - extends automation beyond Azure
-
-### Advanced Track
-1. Begin with **Scenario 3** (PowerShell 7.4) - showcases modern features
-2. Explore **Scenario 4** (Hybrid Worker) - understand distributed automation
-3. Combine concepts from multiple scenarios for custom solutions
 
 ## 📚 What You'll Learn
 
@@ -347,7 +338,5 @@ These scenarios are designed for **learning and demonstration purposes**. Review
 **Provider Versions**: azurerm ~> 3.0, azapi ~> 1.0, azuread ~> 2.0
 
 ---
-
-Made with ❤️ for Azure Automation learners
 
 **Happy Automating! 🚀**

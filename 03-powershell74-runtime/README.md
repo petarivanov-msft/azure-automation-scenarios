@@ -200,5 +200,3 @@ terraform destroy -auto-approve
 **Deployment Time**: ~8-10 minutes  
 **PowerShell Version**: 7.4  
 **Terraform Version**: >= 1.0
-
-Made with ❤️ for modern PowerShell developers

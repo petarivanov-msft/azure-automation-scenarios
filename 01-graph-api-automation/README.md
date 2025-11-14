@@ -255,7 +255,3 @@ This is a **demo configuration** for learning purposes. Review security and comp
 **Last Updated**: November 2025  
 **Terraform Version**: >= 1.0  
 **Provider Versions**: azurerm ~> 3.0, azuread ~> 2.0
-
----
-
-Made with ❤️ for Azure Automation learners

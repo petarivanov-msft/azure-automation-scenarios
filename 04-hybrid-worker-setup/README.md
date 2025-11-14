@@ -207,5 +207,3 @@ This is a **lab/demo configuration** for learning purposes. Review and test thor
 **Difficulty**: Intermediate  
 **Time to Deploy**: ~7-10 minutes  
 **Learning Value**: ⭐⭐⭐⭐⭐
-
-Made with ❤️ for Azure Automation learners
