@@ -1,0 +1,48 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Azure
+.azure/
+*.publishsettings
+
+# Local environment
+.env
+.env.local
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*.tmp
+*~
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+
+# OS
+Thumbs.db
+desktop.ini
