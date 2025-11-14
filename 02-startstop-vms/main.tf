@@ -8,7 +8,8 @@
 # - Schedule for automated VM management
 # - Cost optimization through automated shutdown
 #
-# Cloud Shell Compatible: Uses Bash and jq (no PowerShell dependencies)
+# Azure Cloud Shell Compatible: Works in both PowerShell and Bash modes
+# Requires: Terraform 1.5+, Azure CLI authentication
 # ============================================================================
 
 terraform {
@@ -71,12 +72,22 @@ resource "azurerm_automation_account" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = "Basic"
-  
+
   identity {
     type = "SystemAssigned"
   }
-  
+
   tags = var.tags
+
+  lifecycle {
+    prevent_destroy = false
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
+  }
 }
 
 # ============================================================================
@@ -91,6 +102,12 @@ resource "azurerm_automation_module" "az_accounts" {
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Az.Accounts/2.13.2"
   }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
 }
 
 resource "azurerm_automation_module" "az_compute" {
@@ -100,6 +117,12 @@ resource "azurerm_automation_module" "az_compute" {
 
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Az.Compute/7.1.0"
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
   }
 
   depends_on = [azurerm_automation_module.az_accounts]
@@ -112,6 +135,12 @@ resource "azurerm_automation_module" "az_resources" {
 
   module_link {
     uri = "https://www.powershellgallery.com/api/v2/package/Az.Resources/6.12.0"
+  }
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
   }
 
   depends_on = [azurerm_automation_module.az_accounts]
@@ -183,7 +212,7 @@ resource "azurerm_windows_virtual_machine" "vm1" {
   size                = var.vm_size
   admin_username      = var.admin_username
   admin_password      = random_password.vm_password.result
-  
+
   network_interface_ids = [azurerm_network_interface.vm1.id]
 
   identity {
@@ -230,7 +259,7 @@ resource "azurerm_windows_virtual_machine" "vm2" {
   size                = var.vm_size
   admin_username      = var.admin_username
   admin_password      = random_password.vm_password.result
-  
+
   network_interface_ids = [azurerm_network_interface.vm2.id]
 
   identity {
@@ -277,7 +306,7 @@ resource "azurerm_windows_virtual_machine" "vm3" {
   size                = var.vm_size
   admin_username      = var.admin_username
   admin_password      = random_password.vm_password.result
-  
+
   network_interface_ids = [azurerm_network_interface.vm3.id]
 
   identity {
@@ -301,6 +330,17 @@ resource "azurerm_windows_virtual_machine" "vm3" {
     PowerSchedule = "NightShutdown"
     CostCenter    = "QA"
   })
+}
+
+# ============================================================================
+# Local Variables for Schedule Calculations
+# ============================================================================
+
+locals {
+  # Use provided start time or calculate based on current time
+  # Using plantimestamp() for plan-time evaluation (Terraform 1.5+)
+  # Falls back to a static future date if variable is not provided
+  base_start_time = var.schedule_start_time != "" ? var.schedule_start_time : formatdate("YYYY-MM-DD'T'hh:mm:ss'Z'", timeadd(plantimestamp(), "24h"))
 }
 
 # ============================================================================
@@ -624,11 +664,14 @@ resource "azurerm_automation_schedule" "morning_start" {
   frequency               = "Week"
   interval                = 1
   timezone                = "UTC"
-  start_time              = timeadd(timestamp(), "24h") # Start tomorrow
+  start_time              = local.base_start_time
   description             = "Start VMs at 8:00 AM Monday-Friday"
   week_days               = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-  
-  # Schedule at 8:00 AM UTC (adjust timezone as needed)
+
+  lifecycle {
+    ignore_changes = [start_time] # Prevent drift on subsequent applies
+  }
+
   depends_on = [azurerm_automation_account.main]
 }
 
@@ -640,10 +683,14 @@ resource "azurerm_automation_schedule" "evening_stop" {
   frequency               = "Week"
   interval                = 1
   timezone                = "UTC"
-  start_time              = timeadd(timestamp(), "34h") # 10 hours after morning start
+  start_time              = timeadd(local.base_start_time, "10h")
   description             = "Stop VMs at 6:00 PM Monday-Friday"
   week_days               = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-  
+
+  lifecycle {
+    ignore_changes = [start_time] # Prevent drift on subsequent applies
+  }
+
   depends_on = [azurerm_automation_account.main]
 }
 
@@ -655,9 +702,13 @@ resource "azurerm_automation_schedule" "night_shutdown" {
   frequency               = "Day"
   interval                = 1
   timezone                = "UTC"
-  start_time              = timeadd(timestamp(), "26h") # 2 hours after evening
+  start_time              = timeadd(local.base_start_time, "14h")
   description             = "Stop VMs at 10:00 PM daily"
-  
+
+  lifecycle {
+    ignore_changes = [start_time] # Prevent drift on subsequent applies
+  }
+
   depends_on = [azurerm_automation_account.main]
 }
 
