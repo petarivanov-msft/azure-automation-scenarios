@@ -80,20 +80,18 @@ resource "null_resource" "ps74_runtime" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      az rest --method put `
-        --url "https://management.azure.com${azurerm_automation_account.main.id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" `
-        --body '{\"location\": \"${azurerm_resource_group.main.location}\", \"properties\": {\"runtime\": {\"language\": \"PowerShell\", \"version\": \"7.4\"}, \"description\": \"PowerShell 7.4 runtime environment with modern Az modules\", \"defaultPackages\": {}}}'
+      az rest --method put \
+        --url "https://management.azure.com${azurerm_automation_account.main.id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" \
+        --body '{"location": "${azurerm_resource_group.main.location}", "properties": {"runtime": {"language": "PowerShell", "version": "7.4"}, "description": "PowerShell 7.4 runtime environment with modern Az modules", "defaultPackages": {}}}'
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   provisioner "local-exec" {
     when    = destroy
     command = <<-EOT
-      az rest --method delete `
-        --url "https://management.azure.com${self.triggers.automation_account_id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview"
+      az rest --method delete \
+        --url "https://management.azure.com${self.triggers.automation_account_id}/runtimeEnvironments/ps74-runtime?api-version=2023-05-15-preview" || true
     EOT
-    interpreter = ["pwsh", "-Command"]
     on_failure  = continue
   }
 }
@@ -125,11 +123,10 @@ resource "null_resource" "runtime_packages" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      az rest --method put `
-        --url "https://management.azure.com${local.runtime_id}/packages/${each.key}?api-version=2023-05-15-preview" `
-        --body '{\"properties\": {\"contentLink\": {\"uri\": \"https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}\"}}}'
+      az rest --method put \
+        --url "https://management.azure.com${local.runtime_id}/packages/${each.key}?api-version=2023-05-15-preview" \
+        --body '{"properties": {"contentLink": {"uri": "https://www.powershellgallery.com/api/v2/package/${each.key}/${each.value}"}}}'
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [null_resource.ps74_runtime]
@@ -267,11 +264,10 @@ resource "null_resource" "link_ps74_features_runtime" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      az rest --method patch `
-        --url "https://management.azure.com${azurerm_automation_runbook.ps74_features.id}?api-version=2024-10-23" `
-        --body '{\"properties\": {\"type\": \"PowerShell\", \"runtimeEnvironment\": \"ps74-runtime\"}}'
+      az rest --method patch \
+        --url "https://management.azure.com${azurerm_automation_runbook.ps74_features.id}?api-version=2024-10-23" \
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
@@ -376,11 +372,10 @@ resource "null_resource" "link_parallel_processing_runtime" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      az rest --method patch `
-        --url "https://management.azure.com${azurerm_automation_runbook.parallel_processing.id}?api-version=2024-10-23" `
-        --body '{\"properties\": {\"type\": \"PowerShell\", \"runtimeEnvironment\": \"ps74-runtime\"}}'
+      az rest --method patch \
+        --url "https://management.azure.com${azurerm_automation_runbook.parallel_processing.id}?api-version=2024-10-23" \
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
@@ -501,11 +496,10 @@ resource "null_resource" "link_modern_query_runtime" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      az rest --method patch `
-        --url "https://management.azure.com${azurerm_automation_runbook.modern_query.id}?api-version=2024-10-23" `
-        --body '{\"properties\": {\"type\": \"PowerShell\", \"runtimeEnvironment\": \"ps74-runtime\"}}'
+      az rest --method patch \
+        --url "https://management.azure.com${azurerm_automation_runbook.modern_query.id}?api-version=2024-10-23" \
+        --body '{"properties": {"type": "PowerShell", "runtimeEnvironment": "ps74-runtime"}}'
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
@@ -526,14 +520,13 @@ resource "null_resource" "run_ps74_features" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      Write-Output "Starting PowerShell 7.4 Features Demo runbook..."
-      az automation runbook start `
-        --automation-account-name "${azurerm_automation_account.main.name}" `
-        --resource-group "${azurerm_resource_group.main.name}" `
+      echo "Starting PowerShell 7.4 Features Demo runbook..."
+      az automation runbook start \
+        --automation-account-name "${azurerm_automation_account.main.name}" \
+        --resource-group "${azurerm_resource_group.main.name}" \
         --name "${azurerm_automation_runbook.ps74_features.name}"
-      Write-Output "Job started for Demo-PowerShell74-Features"
+      echo "Job started for Demo-PowerShell74-Features"
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
@@ -548,14 +541,13 @@ resource "null_resource" "run_parallel_processing" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      Write-Output "Starting Parallel Processing Demo runbook..."
-      az automation runbook start `
-        --automation-account-name "${azurerm_automation_account.main.name}" `
-        --resource-group "${azurerm_resource_group.main.name}" `
+      echo "Starting Parallel Processing Demo runbook..."
+      az automation runbook start \
+        --automation-account-name "${azurerm_automation_account.main.name}" \
+        --resource-group "${azurerm_resource_group.main.name}" \
         --name "${azurerm_automation_runbook.parallel_processing.name}"
-      Write-Output "Job started for Demo-ParallelProcessing"
+      echo "Job started for Demo-ParallelProcessing"
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
@@ -571,19 +563,18 @@ resource "null_resource" "run_modern_query" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      Write-Output "Starting Azure Resource Inventory runbook..."
-      az automation runbook start `
-        --automation-account-name "${azurerm_automation_account.main.name}" `
-        --resource-group "${azurerm_resource_group.main.name}" `
-        --name "${azurerm_automation_runbook.modern_query.name}" `
-        --parameters '{\"TopResourceGroups\":3}'
-      Write-Output "Job started for Get-AzureResourceInventory"
-      Write-Output ""
-      Write-Output "All 3 runbooks have been started!"
-      Write-Output "Check the Azure portal to view job output:"
-      Write-Output "https://portal.azure.com/#@/resource${azurerm_automation_account.main.id}/jobs"
+      echo "Starting Azure Resource Inventory runbook..."
+      az automation runbook start \
+        --automation-account-name "${azurerm_automation_account.main.name}" \
+        --resource-group "${azurerm_resource_group.main.name}" \
+        --name "${azurerm_automation_runbook.modern_query.name}" \
+        --parameters '{"TopResourceGroups":3}'
+      echo "Job started for Get-AzureResourceInventory"
+      echo ""
+      echo "All 3 runbooks have been started!"
+      echo "Check the Azure portal to view job output:"
+      echo "https://portal.azure.com/#@/resource${azurerm_automation_account.main.id}/jobs"
     EOT
-    interpreter = ["pwsh", "-Command"]
   }
 
   depends_on = [
