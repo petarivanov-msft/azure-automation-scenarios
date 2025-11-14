@@ -249,7 +249,8 @@ function Deploy-Scenario {
         
         Write-Host ""
         Write-Info "Running Terraform Plan..."
-        terraform plan
+        Write-Host ""
+        terraform plan | Out-Host
         
         if ($LASTEXITCODE -ne 0) {
             Write-ErrorMsg "Terraform plan failed"
@@ -263,7 +264,7 @@ function Deploy-Scenario {
         Write-ColorOutput "═══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
         Write-Host ""
         
-        terraform apply -auto-approve
+        terraform apply -auto-approve | Out-Host
         
         if ($LASTEXITCODE -ne 0) {
             Write-ErrorMsg "Terraform apply failed"
