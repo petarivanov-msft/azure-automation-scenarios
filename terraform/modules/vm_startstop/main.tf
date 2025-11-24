@@ -4,9 +4,14 @@
 # Creates VMs with different power schedule tags and runbooks to manage them
 # ============================================================================
 
+# Get resource group data
+data "azurerm_resource_group" "main" {
+  name = var.resource_group_name
+}
+
 # RBAC - Grant Automation Account Permissions
 resource "azurerm_role_assignment" "automation_vm_contributor" {
-  scope                = var.resource_group_name
+  scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Virtual Machine Contributor"
   principal_id         = var.managed_identity_principal_id
   skip_service_principal_aad_check = true
