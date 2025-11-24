@@ -54,3 +54,6 @@ id_rsa*
 # OS
 Thumbs.db
 desktop.ini
+
+# Archive (old structure kept for reference)
+.archive/

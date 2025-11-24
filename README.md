@@ -1,368 +1,337 @@
-# Azure Automation Demos - Complete Terraform Collection
+# Azure Automation Scenarios Lab
 
-A comprehensive collection of **4 production-ready Azure Automation scenarios** built with Terraform. Each scenario demonstrates different automation capabilities, from Microsoft Graph API integration to Hybrid Worker setups, with a focus on managed identities, infrastructure as code, and modern PowerShell practices.
+A comprehensive Azure Automation lab environment built with Terraform, featuring four production-ready scenarios: Graph API automation, VM power management, PowerShell 7.4 runtime, and Hybrid Worker setup.
 
-## 🎯 Overview
+## 🚀 Quick Start (Recommended)
 
-This repository provides hands-on, deployable examples for learning Azure Automation concepts through Infrastructure as Code. Each scenario is self-contained, well-documented, and includes automated testing to verify functionality.
+**The easiest way to deploy this lab is using Azure Portal Cloud Shell:**
 
-## 📦 What's Included
+### One-Liner Deployment
 
-### Scenario 1: Graph API Automation with Managed Identity
-**Directory**: `01-graph-api-automation/`  
-**Difficulty**: Intermediate  
-**Deploy Time**: ~5-7 minutes
-
-Demonstrates Microsoft Graph API integration with Azure Automation using system-assigned managed identities. Automatically installs Graph SDK modules and configures API permissions to read users, groups, and applications.
-
-**Key Features**:
-- Microsoft Graph SDK v2.11.1 (Authentication, Users, Groups, Applications)
-- Managed Identity with Microsoft Graph API permissions
-- Automated permission grants via Microsoft Graph REST API
-- Test runbook that retrieves users, groups, and applications
-
-### Scenario 2: Start/Stop VMs with Tag-Based Scheduling
-**Directory**: `02-startstop-vms/`  
-**Difficulty**: Beginner  
-**Deploy Time**: ~8-10 minutes
-
-Automated VM power management based on PowerSchedule tags. Creates 3 Windows VMs with different schedules and automated start/stop runbooks with scheduling.
-
-**Key Features**:
-- 3 Windows Server 2022 VMs with PowerSchedule tags (AlwaysOn, BusinessHours, NightShutdown)
-- Automated schedules (8 AM start, 6 PM stop Mon-Fri, 10 PM daily shutdown)
-- Tag-based VM filtering and power management
-- Cost optimization (up to 50% savings with scheduling)
-
-### Scenario 3: PowerShell 7.4 Runtime Environment
-**Directory**: `03-powershell74-runtime/`  
-**Difficulty**: Advanced  
-**Deploy Time**: ~6-8 minutes
-
-Showcases PowerShell 7.4 features in Azure Automation including custom runtime environments, modern syntax, parallel processing, and enhanced cmdlets.
-
-**Key Features**:
-- PowerShell 7.4 runtime environment via REST API
-- Modern PowerShell syntax (ternary operators, null coalescing, pipeline chaining)
-- Parallel processing with ForEach-Object -Parallel
-- 5 Az modules (Accounts 3.0.4, Compute 8.3.0, Storage 7.3.0, Resources 7.4.0, Monitor 5.2.1)
-- 3 demo runbooks showcasing PS 7.4 capabilities
-
-### Scenario 4: Hybrid Worker Lab Setup
-**Directory**: `04-hybrid-worker-setup/`  
-**Difficulty**: Intermediate  
-**Deploy Time**: ~7-10 minutes
-
-Complete Hybrid Worker environment with Windows VM, Hybrid Worker Extension, managed identities, and test runbook. Demonstrates running Azure Automation runbooks on machines outside Azure.
-
-**Key Features**:
-- Windows Server 2022 VM with Hybrid Worker Extension
-- Hybrid Worker Group setup and registration
-- System-assigned managed identities for VM and Automation Account
-- PowerShell module deployment (Az.Accounts, Az.Compute)
-- Test runbook with managed identity authentication
-- Automated testing on deployment
-
-## 🚀 Quick Start
-
-### Deploy from Azure Cloud Shell (Recommended)
-
-Azure Cloud Shell has Terraform and Azure CLI pre-installed, making deployment easy:
+1. Open [Azure Portal](https://portal.azure.com)
+2. Click on the **Cloud Shell** icon (terminal icon in the top menu)
+3. Select **Bash** when prompted (first-time users)
+4. Run this single command:
 
 ```bash
-# 1. Open Azure Cloud Shell (PowerShell mode)
-#    https://shell.azure.com
-
-# 2. (Optional) Change subscription if needed
-az account set --subscription "YOUR_SUBSCRIPTION_ID_OR_NAME"
-
-# 3. Clone the repository
-git clone https://github.com/petarivanov-msft/azure-automation-scenarios.git
-
-# 4. Navigate to the repository
-cd azure-automation-scenarios
-
-# 5. Run the interactive deployment script
-./deploy.ps1
+bash <(curl -s https://raw.githubusercontent.com/petarivanov-msft/azure-automation-scenarios/refs/heads/main/init-lab.sh)
 ```
 
-**Note**: Cloud Shell automatically authenticates with your Azure subscription, so no `az login` is needed!
+### What You Get
 
-The interactive script provides:
-- ✅ Interactive menu with scenario selection
-- ✅ Prerequisite checking (Terraform, Azure CLI)
-- ✅ Scenario details
-- ✅ Automated Terraform init, plan, and apply
-- ✅ Post-deployment summary with cleanup reminders
-- ✅ Colorful, user-friendly interface
+This lab creates a comprehensive Azure Automation environment with:
 
-### Manual Deployment
+- **Centralized Automation Account**: Single automation account with managed identity
+- **Graph API Integration**: Microsoft Graph SDK with read permissions for users, groups, and applications
+- **VM Power Management**: 3 test VMs with different power schedules (AlwaysOn, BusinessHours, NightShutdown)
+- **PowerShell 7.4 Runtime**: Modern PowerShell features including parallel processing and ternary operators
+- **Hybrid Worker**: Windows VM configured as Hybrid Worker with managed identity
 
-For manual control, navigate to any scenario directory:
+### Deployment Details
 
-```powershell
-# Navigate to desired scenario
-cd 01-graph-api-automation
+- **Duration**: 15-25 minutes for complete setup
+- **Interaction**: You'll be prompted for resource names, region, and scenario selection
+- **Authentication**: Uses your current Azure Portal session (no separate login required)
+- **Modular Design**: Enable/disable specific scenarios based on your needs
 
-# Initialize Terraform
-terraform init
+## 🏗️ Architecture
 
-# Review the plan
-terraform plan
+This lab demonstrates a unified Azure Automation environment:
 
-# Deploy
-terraform apply
+### Core Infrastructure
+- **Resource Group** with all resources
+- **Azure Automation Account** with system-assigned managed identity
+- **Virtual Network** with subnet for VMs
+- **Network Security Group** with appropriate security rules
 
-# When done, cleanup
-terraform destroy -auto-approve
-```
+### Scenario 1: Graph API Automation
+- **Modules**: Microsoft.Graph.Authentication, Users, Groups, Applications (v2.11.1)
+- **Permissions**: User.Read.All, Group.Read.All, Application.Read.All, Directory.Read.All
+- **Runbooks**: Get-UsersReport, Get-GroupsReport, Get-ApplicationsReport
+- **Authentication**: Managed identity with Graph API permissions
 
-### Cleanup Deployed Scenarios
+### Scenario 2: Start/Stop VMs
+- **VMs**: 3 Windows Server 2022 VMs with different power schedules
+- **Tags**: PowerSchedule (AlwaysOn, BusinessHours, NightShutdown)
+- **Runbooks**: Start-VMsByTag, Stop-VMsByTag, Get-VMPowerStateReport
+- **RBAC**: Virtual Machine Contributor role for managed identity
 
-Use the interactive cleanup script to destroy any deployed scenarios:
+### Scenario 3: PowerShell 7.4 Runtime
+- **Runtime Environment**: PowerShell 7.4 with modern syntax support
+- **Modules**: Az.Accounts 3.0.4, Az.Compute 8.3.0, Az.Storage 7.3.0, Az.Resources 7.4.0, Az.Monitor 5.2.1
+- **Runbooks**: Demo-PowerShell74-Features, Demo-ParallelProcessing, Get-AzureResourceInventory
+- **Features**: Ternary operators, null coalescing, parallel processing
 
-```powershell
-.\destroy.ps1
-```
-
-The cleanup script provides:
-- ✅ Automatic detection of deployed scenarios
-- ✅ Interactive selection of scenarios to destroy
-- ✅ Option to destroy all scenarios at once
-- ✅ Confirmation prompts to prevent accidental deletion
-- ✅ Automatic cleanup of local Terraform files
+### Scenario 4: Hybrid Worker
+- **VM**: Windows Server 2022 with system-assigned managed identity
+- **Extension**: HybridWorkerForWindows extension
+- **Worker Group**: Hybrid Worker Group with VM registration
+- **Runbook**: Test-HybridWorker-ManagedIdentity
+- **RBAC**: Contributor role for VM and Automation Account identities
 
 ## 📋 Prerequisites
 
-### Required Tools
+### For Cloud Shell Deployment (Recommended)
+- Azure subscription with appropriate permissions
+- No local software required - everything runs in Azure Cloud Shell!
 
-- **Azure Subscription** - with appropriate permissions (Contributor role recommended)
-- **Terraform** - Version >= 1.0 ([Download](https://www.terraform.io/downloads))
-- **Azure CLI** - Latest version ([Download](https://docs.microsoft.com/cli/azure/install-azure-cli))
-- **PowerShell** - Version 7.0+ recommended (for deploy.ps1 script)
+### For Manual Deployment
+- **Azure CLI** (latest version)
+- **Terraform** >= 1.3.0
+- **Git** for repository cloning
+- **Bash Shell** (Linux/macOS/WSL)
 
 ### Azure Permissions
 
-Each scenario requires different permissions:
-
 | Scenario | Required Permissions | Notes |
 |----------|---------------------|-------|
-| 1 - Graph API | **Privileged Administrator** or **Application Administrator** role in Entra ID | ⚠️ Requires elevated permissions to grant Graph API permissions |
-| 2 - Start/Stop VMs | Contributor on resource group | ✅ Works with standard permissions |
-| 3 - PowerShell 7.4 | Contributor on resource group | ✅ Works with standard permissions |
-| 4 - Hybrid Worker | Contributor on subscription (for role assignments) | ✅ Works with standard permissions |
+| Graph API | **Privileged Administrator** or **Application Administrator** in Entra ID | ⚠️ Elevated permissions required |
+| Start/Stop VMs | Contributor on resource group | ✅ Standard permissions |
+| PowerShell 7.4 | Contributor on resource group | ✅ Standard permissions |
+| Hybrid Worker | Contributor on subscription | ✅ Standard permissions |
 
-### Installation Verification
+## 🧹 Cleanup
 
-```powershell
+### Cloud Shell Deployment
+
+```bash
+cd azure-automation-scenarios/terraform
+terraform destroy -auto-approve
+```
+
+### Manual Deployment
+
+```bash
+cd terraform
+terraform destroy -auto-approve
+```
+
+This will remove all deployed resources and avoid ongoing charges.
+
+## 📖 Manual Deployment (Optional)
+
+**Advanced users who prefer local development:**
+
+### Prerequisites Check
+
+```bash
 # Check Terraform
 terraform version
 
 # Check Azure CLI
 az version
 
-# Check PowerShell
-$PSVersionTable.PSVersion
+# Login to Azure
+az login
+az account set --subscription "YOUR_SUBSCRIPTION_ID"
 ```
 
-## 📚 What You'll Learn
+### Deploy
 
-Across all scenarios, you'll gain hands-on experience with:
+```bash
+# Clone repository
+git clone https://github.com/petarivanov-msft/azure-automation-scenarios.git
+cd azure-automation-scenarios/terraform
 
-1. **Infrastructure as Code** - Terraform best practices and patterns
-2. **Azure Automation** - Runbooks, modules, schedules, hybrid workers
-3. **Managed Identities** - Secure authentication without credentials
-4. **Microsoft Graph API** - Application permissions and API integration
-5. **PowerShell Automation** - Modern PowerShell 7.4 features
-6. **RBAC** - Role-based access control in Azure
-7. **Cost Optimization** - VM scheduling and resource management
-8. **Hybrid Cloud** - Running automation outside Azure
-9. **REST APIs** - Azure REST API integration with Terraform
-10. **Automated Testing** - Infrastructure validation patterns
+# Initialize Terraform
+terraform init
 
-## 🔧 Repository Structure
+# Create variables file
+cat > terraform.tfvars <<EOF
+resource_group_name     = "rg-automation-lab"
+location                = "eastus"
+automation_account_name = "auto-lab-12345"
+vm_admin_username       = "azureadmin"
+vm_admin_password       = "YourSecurePassword123!"
 
-```
-azure-automation-demos/
-├── deploy.ps1                      # Interactive deployment script
-├── destroy.ps1                     # Interactive cleanup script
-├── common-functions.ps1            # Shared PowerShell functions
-├── format-all.ps1                  # Terraform formatting utility
-├── README.md                       # This file
-├── LICENSE                         # MIT License
-├── .gitignore                      # Git ignore patterns
-├── .editorconfig                   # Editor configuration for consistent formatting
-│
-├── terraform-modules/              # Shared Terraform resources & docs
-│   ├── README.md                   # Module documentation
-│   └── common-variables/           # Reference implementations
-│
-├── 01-graph-api-automation/        # Scenario 1
-│   ├── main.tf                     # Terraform configuration
-│   ├── variables.tf                # Variable definitions
-│   ├── outputs.tf                  # Output values
-│   └── README.md                   # Scenario documentation
-│
-├── 02-startstop-vms/               # Scenario 2
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   └── README.md
-│
-├── 03-powershell74-runtime/        # Scenario 3
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   └── README.md
-│
-└── 04-hybrid-worker-setup/         # Scenario 4
-    ├── main.tf
-    ├── variables.tf
-    ├── outputs.tf
-    └── README.md
+# Scenario toggles (true/false)
+enable_graph_api       = true
+enable_startstop_vms   = true
+enable_powershell74    = true
+enable_hybrid_worker   = true
+EOF
+
+# Review plan
+terraform plan
+
+# Deploy
+terraform apply
 ```
 
-## 🧪 Testing & Validation
+## 🎮 Using the Lab
 
-Each scenario includes:
+### View Deployed Resources
 
-- **Automated Testing** - Resources deployed and tested during apply
-- **Output Validation** - Comprehensive outputs with portal links
-- **Test Commands** - Manual test commands in README files
-- **Runbook Execution** - Automated or manual runbook testing
+```bash
+# Get all outputs
+terraform output
+
+# Get specific output
+terraform output automation_account_name
+terraform output automation_account_portal_url
+
+# Get VM password (sensitive)
+terraform output -raw vm_admin_password
+```
+
+### Execute Runbooks
+
+#### Graph API Runbooks
+
+```bash
+# Get top 5 users
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Get-UsersReport" \
+  --parameters '{"TopCount":5}'
+
+# Get security groups
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Get-GroupsReport" \
+  --parameters '{"TopCount":10,"GroupType":"Security"}'
+```
+
+#### VM Power Management
+
+```bash
+# Start BusinessHours VMs
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Start-VMsByTag" \
+  --parameters '{"Schedule":"BusinessHours"}'
+
+# Get VM power state report
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Get-VMPowerStateReport"
+```
+
+#### PowerShell 7.4 Demos
+
+```bash
+# Run PS 7.4 features demo
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Demo-PowerShell74-Features"
+
+# Run parallel processing comparison
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Demo-ParallelProcessing"
+```
+
+#### Hybrid Worker Test
+
+```bash
+# Get worker group name
+WORKER_GROUP=$(terraform output -raw hybrid_worker_group_name)
+
+# Run test on Hybrid Worker
+az automation runbook start \
+  --automation-account-name $(terraform output -raw automation_account_name) \
+  --resource-group $(terraform output -raw resource_group_name) \
+  --name "Test-HybridWorker-ManagedIdentity" \
+  --run-on "$WORKER_GROUP"
+```
+
+## 🔧 Customization
+
+### Enable/Disable Scenarios
+
+Edit `terraform.tfvars` to toggle scenarios:
+
+```hcl
+enable_graph_api       = true   # Set to false to skip
+enable_startstop_vms   = true   # Set to false to skip
+enable_powershell74    = true   # Set to false to skip
+enable_hybrid_worker   = true   # Set to false to skip
+```
+
+### Change Azure Region
+
+```hcl
+location = "westus2"  # or any other Azure region
+```
+
+### Customize VM Settings
+
+```hcl
+vm_admin_username = "myadmin"
+vm_admin_password = "MySecurePass123!"
+```
 
 ## 🔍 Troubleshooting
 
 ### Common Issues
 
-**Issue**: Terraform initialization fails  
-**Solution**: Ensure Terraform is installed and in PATH. Run `terraform version` to verify.
+**Issue**: Graph API runbooks fail with "Insufficient privileges"  
+**Solution**: Wait 5-10 minutes after deployment for permissions to propagate
 
-**Issue**: Azure CLI authentication errors  
-**Solution**: Run `az login` and ensure you're logged into the correct subscription.
-
-**Issue**: Insufficient permissions  
-**Solution**: Verify you have Contributor role (or higher) on the subscription/resource group.
-
-**Issue**: Module import fails in Automation Account  
-**Solution**: Module imports can take 2-3 minutes. Wait for import to complete before running runbooks.
+**Issue**: Module import fails  
+**Solution**: Modules can take 2-3 minutes to import. Check Automation Account → Modules → verify status is "Available"
 
 **Issue**: Hybrid Worker registration fails  
-**Solution**: Check that AutomationHybridServiceUrl is correctly retrieved and VM has network connectivity.
+**Solution**: Check VM has network connectivity and extension is installed properly
 
 **Issue**: PowerShell 7.4 runtime not showing  
-**Solution**: Ensure runbook type is "PowerShell" (not "PowerShell72") and runtime environment is linked via PATCH API.
+**Solution**: Runtime environment requires Azure CLI REST API. Ensure proper authentication.
 
 ### Getting Help
 
-- Check individual scenario README files for specific troubleshooting
+- Check individual runbook job history in Azure Portal
 - Review Terraform state: `terraform show`
-- Check Azure Portal for resource status
-- Review Automation Account job history for runbook errors
+- Check Azure Activity Log for deployment errors
+- Review NSG rules if VMs are not accessible
 
-## 🎮 Advanced Usage
+## 📚 What You'll Learn
 
-### Customization
-
-Edit `variables.tf` in each scenario to customize:
-- Azure region
-- Resource naming prefixes
-- VM sizes and configurations
-- Module versions
-- Tag values
-
-### Multi-Environment Deployments
-
-Use Terraform workspaces for multiple environments:
-
-```powershell
-# Create workspace
-terraform workspace new dev
-
-# Switch workspace
-terraform workspace select prod
-
-# List workspaces
-terraform workspace list
-```
-
-### Integration with CI/CD
-
-All scenarios support CI/CD integration:
-- Use service principal authentication
-- Store state in Azure Storage backend
-- Implement approval gates for production
-
-### Maintainer Tools
-
-For contributors and maintainers, this repository includes several utility scripts:
-
-```powershell
-# Format all Terraform files
-.\format-all.ps1
-
-# Validate repository health
-.\validate-repo.ps1
-```
-
-**Developer Resources**:
-- `common-functions.ps1` - Shared PowerShell functions
-- `.editorconfig` - Consistent formatting across editors
-- `terraform-modules/` - Reference implementations
-- [TOOLS.md](TOOLS.md) - Complete tool documentation
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-
-## 📄 License
-
-MIT License - See [LICENSE](LICENSE) file for details.
+1. **Infrastructure as Code**: Terraform best practices with modular design
+2. **Azure Automation**: Runbooks, modules, schedules, and Hybrid Workers
+3. **Managed Identities**: Secure authentication without credentials
+4. **Microsoft Graph API**: Application permissions and API integration
+5. **PowerShell Automation**: Modern PowerShell 7.4 features
+6. **RBAC**: Role-based access control in Azure
+7. **Cost Optimization**: VM scheduling and resource management
+8. **Hybrid Cloud**: Running automation outside Azure
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
+We welcome contributions! Please:
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+3. Test your changes thoroughly
+4. Submit a pull request with a clear description
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔒 Security
+
+Please review our [SECURITY.md](SECURITY.md) for reporting security vulnerabilities.
 
 ## ⚠️ Disclaimer
 
-These scenarios are designed for **learning and demonstration purposes**. Review and test thoroughly before adapting for production use. Always follow your organization's security and compliance requirements.
+This lab is designed for **learning and demonstration purposes**. Review and test thoroughly before adapting for production use. Always follow your organization's security and compliance requirements.
 
-## 📞 Support & Feedback
+## 📞 Support & Issues
 
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Start a discussion for questions or ideas
-- **Documentation**: Each scenario includes detailed README
-
-## 🎯 Next Steps
-
-1. **Clone this repository**
-   ```powershell
-   git clone <repository-url>
-   cd azure-automation-demos
-   ```
-
-2. **Run the interactive deployment script**
-   ```powershell
-   .\deploy.ps1
-   ```
-
-3. **Select a scenario** and follow the prompts
-
-4. **Explore the deployed resources** in Azure Portal
-
-5. **Remember to clean up** resources when done:
-   ```powershell
-   cd <scenario-directory>
-   terraform destroy -auto-approve
-   ```
+- **Documentation**: Check this README and module-specific documentation
+- **Issues**: Open an issue in this GitHub repository
+- **Questions**: Review the troubleshooting section above
 
 ---
 
-**Package Version**: 1.0  
-**Last Updated**: November 2025  
-**Terraform Version**: >= 1.0  
-**Provider Versions**: azurerm ~> 3.0, azapi ~> 1.0, azuread ~> 2.0
+**Last Updated**: November 2024  
+**Terraform Version**: >= 1.3.0  
+**Provider Versions**: azurerm ~> 3.0, azuread ~> 2.0, azapi ~> 1.0
 
 ---
 
