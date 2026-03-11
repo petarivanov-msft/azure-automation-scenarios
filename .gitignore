@@ -1,59 +1,6 @@
-# Terraform
 .terraform/
-.terraform.lock.hcl
 *.tfstate
-*.tfstate.*
-*.tfvars
+*.tfstate.backup
+.terraform.lock.hcl
 *.tfplan
-tfplan
-*tfplan*
-crash.log
-crash.*.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraformrc
-terraform.rc
-
-# Azure
-.azure/
-*.publishsettings
-
-# Local environment
-.env
-.env.local
-*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 .DS_Store
-
-# Temporary test directories
-/test/
-/temp/
-
-# Logs
-*.log
-logs/
-
-# Backup files
-*.bak
-*.tmp
-*~
-
-# SSH keys
-*.pem
-*.key
-id_rsa*
-
-# OS
-Thumbs.db
-desktop.ini
-
-# Archive (old structure kept for reference)
-.archive/
