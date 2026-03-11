@@ -47,18 +47,18 @@ module "runbooks" {
 module "hybrid_workers" {
   count = var.enable_hybrid_workers ? 1 : 0
 
-  source                            = "./modules/hybrid_workers"
-  resource_group_name               = azurerm_resource_group.main.name
-  location                          = var.location
-  automation_account_id             = module.automation_account.automation_account_id
-  automation_account_name           = module.automation_account.automation_account_name
-  automation_identity_principal_id  = module.automation_account.managed_identity_principal_id
-  subscription_id                   = data.azurerm_client_config.current.subscription_id
-  subnet_id                         = module.network[0].subnet_id
-  vm_admin_username                 = var.vm_admin_username
-  vm_admin_password                 = local.vm_password
-  run_test_runbook                  = var.run_test_runbook
-  tags                              = var.tags
+  source                           = "./modules/hybrid_workers"
+  resource_group_name              = azurerm_resource_group.main.name
+  location                         = var.location
+  automation_account_id            = module.automation_account.automation_account_id
+  automation_account_name          = module.automation_account.automation_account_name
+  automation_identity_principal_id = module.automation_account.managed_identity_principal_id
+  subscription_id                  = data.azurerm_client_config.current.subscription_id
+  subnet_id                        = module.network[0].subnet_id
+  vm_admin_username                = var.vm_admin_username
+  vm_admin_password                = local.vm_password
+  run_test_runbook                 = var.run_test_runbook
+  tags                             = var.tags
 }
 
 module "graph_api" {
