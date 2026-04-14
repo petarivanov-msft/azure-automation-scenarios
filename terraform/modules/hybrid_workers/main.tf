@@ -251,28 +251,28 @@ resource "azurerm_virtual_machine_extension" "hybrid_worker_rhel" {
 
 # Automation account MI needs Contributor to manage resources via runbooks
 resource "azurerm_role_assignment" "automation_contributor" {
-  scope                            = "/subscriptions/${var.subscription_id}"
+  scope                            = var.resource_group_id
   role_definition_name             = "Contributor"
   principal_id                     = var.automation_identity_principal_id
   skip_service_principal_aad_check = true
 }
 
 resource "azurerm_role_assignment" "vm_windows_contributor" {
-  scope                            = "/subscriptions/${var.subscription_id}"
+  scope                            = var.resource_group_id
   role_definition_name             = "Contributor"
   principal_id                     = azurerm_windows_virtual_machine.windows.identity[0].principal_id
   skip_service_principal_aad_check = true
 }
 
 resource "azurerm_role_assignment" "vm_ubuntu_contributor" {
-  scope                            = "/subscriptions/${var.subscription_id}"
+  scope                            = var.resource_group_id
   role_definition_name             = "Contributor"
   principal_id                     = azurerm_linux_virtual_machine.ubuntu.identity[0].principal_id
   skip_service_principal_aad_check = true
 }
 
 resource "azurerm_role_assignment" "vm_rhel_contributor" {
-  scope                            = "/subscriptions/${var.subscription_id}"
+  scope                            = var.resource_group_id
   role_definition_name             = "Contributor"
   principal_id                     = azurerm_linux_virtual_machine.rhel.identity[0].principal_id
   skip_service_principal_aad_check = true

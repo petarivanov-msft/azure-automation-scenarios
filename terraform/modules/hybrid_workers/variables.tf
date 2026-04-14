@@ -39,8 +39,8 @@ variable "vm_admin_password" {
   sensitive   = true
 }
 
-variable "subscription_id" {
-  description = "Azure subscription ID"
+variable "resource_group_id" {
+  description = "ID of the resource group for RBAC scoping"
   type        = string
 }
 

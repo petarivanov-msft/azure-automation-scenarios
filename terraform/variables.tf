@@ -50,6 +50,12 @@ variable "enable_graph_api" {
   default     = false
 }
 
+variable "allowed_source_ip" {
+  description = "Source IP or CIDR allowed for RDP/WinRM/SSH access. Use '*' for any (not recommended for production)."
+  type        = string
+  default     = "*"
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

@@ -30,6 +30,7 @@ module "network" {
   source              = "./modules/network"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.location
+  allowed_source_ip   = var.allowed_source_ip
   tags                = var.tags
 }
 
@@ -53,7 +54,7 @@ module "hybrid_workers" {
   automation_account_id            = module.automation_account.automation_account_id
   automation_account_name          = module.automation_account.automation_account_name
   automation_identity_principal_id = module.automation_account.managed_identity_principal_id
-  subscription_id                  = data.azurerm_client_config.current.subscription_id
+  resource_group_id                = azurerm_resource_group.main.id
   subnet_id                        = module.network[0].subnet_id
   vm_admin_username                = var.vm_admin_username
   vm_admin_password                = local.vm_password

@@ -40,13 +40,13 @@ prompt_input() {
     echo -en "${CYAN}$prompt_msg ${YELLOW}[$current_value]${CYAN}: ${NC}"
     read -r input
     if [ -n "$input" ]; then
-      eval "$var_name=\"$input\""
+      printf -v "$var_name" '%s' "$input"
     fi
   else
     while [ -z "${!var_name}" ]; do
       echo -en "${CYAN}$prompt_msg: ${NC}"
       read -r input
-      eval "$var_name=\"$input\""
+      printf -v "$var_name" '%s' "$input"
     done
   fi
 }
